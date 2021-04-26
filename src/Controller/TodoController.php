@@ -32,7 +32,7 @@ class TodoController extends AbstractController
     }
 
     /**
-     * @Route("/add/{name}/{content}", name="addTodo")
+     * @Route("/addToDo/{name}/{content}", name="addTodo")
      */
     public function addTodo($name, $content="Blank", SessionInterface $session) {
 
@@ -45,10 +45,12 @@ class TodoController extends AbstractController
             // Je vérifie si le todo existe
             $todos = $session->get('todos');
             if (isset($todos[$name])) {
-                //ko => messsage erreur + redirection
-                $this->addFlash('error', "Le todo $name existe déjà");
+                //Si il existe deja, on le modifie
+                $todos[$name] = $content;
+                $session->set('todos', $todos);
+                $this->addFlash('success', "Le todo $name a été modifié avec succès");
             } else {
-                //ok => j ajoute et je redirige avec message succès
+                //Si l'element n'existe pas, on le créer.
                 $todos[$name] = $content;
                 $session->set('todos', $todos);
                 $this->addFlash('success', "Le todo $name a été ajouté avec succès");
@@ -57,11 +59,10 @@ class TodoController extends AbstractController
         return $this->redirectToRoute('todo');
     }
 
-
     /**
-     * @Route("/modify/{name}/{content}", name="modifyToDo")
+     * @Route("/deleteToDo/{key}", name="deleteToDo")
      */
-    public function modifyToDo($name, $content, SessionInterface $session) {
+    public function deleteToDo($key, SessionInterface $session) {
 
         // Vérifier que ma session contient le tableau de todo
         if (!$session->has('todos')) {
@@ -71,40 +72,14 @@ class TodoController extends AbstractController
             //ok
             // Je vérifie si le todo existe
             $todos = $session->get('todos');
-            if (!isset($todos[$name])) {
-                //ko => messsage erreur + redirection
-                $this->addFlash('error', "Le todo $name n'existe pas");
-            } else {
-                //ok => j ajoute et je redirige avec message succès
-                $todos[$name] = $content;
-                $session->set('todos', $todos);
-                $this->addFlash('success', "Le todo $name a été modifié avec succès");
-            }
-        }
-        return $this->redirectToRoute('todo');
-    }
-
-    /**
-     * @Route("/deleteToDo/{index<\d+>}", name="deleteToDo")
-     */
-    public function deleteToDo($index, SessionInterface $session) {
-
-        // Vérifier que ma session contient le tableau de todo
-        if (!$session->has('todos')) {
-            //ko => messsage erreur + redirection
-            $this->addFlash('error', "La liste des todos n'est pas encore initialisée");
-        } else {
-            //ok
-            // Je vérifie si le todo existe
-            $todos = $session->get('todos');
-            if (count($todos)-1 < $index) {
+            if (!isSet($todos[$key])) {
                 //ko => messsage erreur + redirection
                 $this->addFlash('error', "Le todo n'existe pas");
             } else {
                 //ok => je supprime le todo
-                unset($todos[key(array_splice($todos, $index, 1))]);
+                unset($todos[$key]);
                 $session->set('todos', $todos);
-                $this->addFlash('success', "Le todo a été supprimé avec succès");
+                $this->addFlash('success', "L'element d'indice $key a été supprimé avec succès");
             }
         }
         return $this->redirectToRoute('todo');
