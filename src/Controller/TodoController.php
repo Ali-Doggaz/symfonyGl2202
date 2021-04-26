@@ -26,7 +26,7 @@ class TodoController extends AbstractController
                 'mercredi' => 'Js',
             ];
             $session->set('todos', $todos);
-            $this->addFlash('info', "Bienvenu dans votre plateforme de gestion des todos");
+            $this->addFlash('info', "Bienvenue dans votre plateforme de gestion des todos");
         }
         return $this->render('todo/index.html.twig');
     }
@@ -44,11 +44,16 @@ class TodoController extends AbstractController
             //ok
             // Je vérifie si le todo existe
             $todos = $session->get('todos');
+
             if (isset($todos[$name])) {
-                //Si il existe deja, on le modifie
-                $todos[$name] = $content;
-                $session->set('todos', $todos);
-                $this->addFlash('success', "Le todo $name a été modifié avec succès");
+                //Si il a la meme valeur que celle qu'on essaye de lui assigner
+                if ($todos[$name] == $content) $this->addFlash('info', "Le todo $name possede deja la valeur que vous tentez de lui assigner.");
+                // Sinon
+                else {
+                    $todos[$name] = $content;
+                    $session->set('todos', $todos);
+                    $this->addFlash('success', "Le todo $name a été modifié avec succès");
+                }
             } else {
                 //Si l'element n'existe pas, on le créer.
                 $todos[$name] = $content;
@@ -72,7 +77,7 @@ class TodoController extends AbstractController
             //ok
             // Je vérifie si le todo existe
             $todos = $session->get('todos');
-            if (!isSet($todos[$key])) {
+            if (!array_key_exists($key, $todos)) {
                 //ko => messsage erreur + redirection
                 $this->addFlash('error', "Le todo n'existe pas");
             } else {
@@ -95,7 +100,11 @@ class TodoController extends AbstractController
             //ko => messsage erreur + redirection
             $this->addFlash('error', "La liste des todos n'est pas encore initialisée");
         } else {
-            $session->set('todos', []);
+            $session->set('todos', [
+                        'Lundi' => 'HTML',
+                        'Mardi' => 'CSS',
+                        'Mercredi' => 'JS',
+                        ]);
             $this->addFlash('success', "La liste a été réinitialisée avec succés!");
         }
         return $this->redirectToRoute('todo');
