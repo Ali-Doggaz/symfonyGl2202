@@ -34,7 +34,7 @@ class TodoController extends AbstractController
     /**
      * @Route("/add/{name}/{content}", name="addTodo")
      */
-    public function addTodo($name, $content, SessionInterface $session) {
+    public function addTodo($name, $content="Blank", SessionInterface $session) {
 
         // Vérifier que ma session contient le tableau de todo
         if (!$session->has('todos')) {
