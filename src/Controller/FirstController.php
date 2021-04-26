@@ -14,13 +14,8 @@ class FirstController extends AbstractController
      * @Route("", name="home")
      */
     public function index() {
-        return $this->redirectToRoute('first');
+        return $this->redirectToRoute('todo');
     }
-    /**
-     * @Route("/first", name="first")
-     */
-    public function first() {
-        return new Response("<h1>Hello Gl2 2021</h1>");
-    }
+
 
 }
